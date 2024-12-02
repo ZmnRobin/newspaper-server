@@ -131,9 +131,14 @@ export const createArticle = async (
   const userId = req.user?.id;
 
   try {
-    let thumbnail = null;
+    let thumbnail = req.body.thumbnail || null;
+
     if (req.file) {
       thumbnail = req.file.path;
+    }
+
+    if(!thumbnail){
+      return res.status(400).json({ message: "Thumbnail is required" });
     }
 
     const newArticle = await Article.create({
@@ -202,7 +207,7 @@ export const updateArticle = async (
           await cloudinary.uploader.destroy(`articles/${publicId}`);
         }
       }
-      thumbnail = req.file.path; // New Cloudinary URL
+      thumbnail = req.body.thumbnail || req.file.path;
     }
 
     await article.update({
